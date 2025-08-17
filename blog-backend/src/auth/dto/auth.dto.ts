@@ -25,3 +25,9 @@ export class LoginDto {
   @MinLength(6)
   password: string;
 }
+
+export class RefreshTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  refreshToken: string;
+}

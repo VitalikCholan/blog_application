@@ -34,6 +34,13 @@ export class User {
   })
   password: string;
 
+  @Column({
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
+  refreshToken: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
