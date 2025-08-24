@@ -2,7 +2,9 @@ import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request } from
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { RefreshTokenDto } from './dto/auth.dto';
-import { JwtAuthGuard } from './guards/jwt.auth';
+import { JwtAuthGuard } from './guards/jwt.auth.guard';
+import { AdvancedThrottleAuthGuard } from './guards/throttle-auth.guard';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -15,6 +17,8 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseGuards(AdvancedThrottleAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 60 } }) // 5 attempts per minute - prevents brute force
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
