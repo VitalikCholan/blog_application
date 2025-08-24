@@ -41,6 +41,19 @@ export class User {
   })
   refreshToken: string;
 
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  resetPasswordToken: string;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  resetPasswordExpires: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 

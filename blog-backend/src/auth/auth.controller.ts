@@ -2,6 +2,7 @@ import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request } from
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { RefreshTokenDto } from './dto/auth.dto';
+import { ForgotPasswordDto, ResetPasswordDto } from './dto/password-reset.dto';
 import { JwtAuthGuard } from './guards/jwt.auth.guard';
 import { AdvancedThrottleAuthGuard } from './guards/throttle-auth.guard';
 import { Throttle } from '@nestjs/throttler';
@@ -30,6 +31,14 @@ export class AuthController {
     return this.authService.refreshToken(refreshTokenDto);
   }
 
+  @Post('forgot-password')
+  @UseGuards(AdvancedThrottleAuthGuard)
+  @Throttle({ default: { limit: 3, ttl: 60 } }) // 3 attempts per 1 minute
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
   @Post('logout')     
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -42,5 +51,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async revokeAllTokens(@Request() req: Request & { user: { id: number } }) {
     return this.authService.revokeAllTokens(req.user.id);
+  }
+
+  @Post('reset-password')
+  @UseGuards(AdvancedThrottleAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 60 } }) // 5 attempts per 1 minute
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
